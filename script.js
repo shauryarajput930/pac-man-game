@@ -70,10 +70,10 @@ const pacman = {
 };
 
 const ghosts = [
-  { x: 13, y: 14, dirX: 1, dirY: 0, color: "#ff4b4b", mode: "normal", scaredTimer: 0 },
-  { x: 14, y: 14, dirX: -1, dirY: 0, color: "#4bc6ff", mode: "normal", scaredTimer: 0 },
-  { x: 13, y: 15, dirX: 0, dirY: -1, color: "#ffb8ff", mode: "normal", scaredTimer: 0 },
-  { x: 14, y: 15, dirX: 0, dirY: 1, color: "#ffb852", mode: "normal", scaredTimer: 0 },
+  { x: 13, y: 14, dirX: 1, dirY: 0, color: "#ff4b4b", mode: "normal", scaredTimer: 0, releaseTimer: 0 },
+  { x: 14, y: 14, dirX: -1, dirY: 0, color: "#4bc6ff", mode: "normal", scaredTimer: 0, releaseTimer: 0 },
+  { x: 13, y: 14, dirX: 0, dirY: -1, color: "#ffb8ff", mode: "normal", scaredTimer: 0, releaseTimer: 3 }, // Release after 3 seconds
+  { x: 14, y: 14, dirX: 0, dirY: 1, color: "#ffb852", mode: "normal", scaredTimer: 0, releaseTimer: 6 }, // Release after 6 seconds
 ];
 
 let score = 0;
@@ -235,6 +235,7 @@ function resetEntities() {
   ghosts[0].dirY = 0;
   ghosts[0].mode = "normal";
   ghosts[0].scaredTimer = 0;
+  ghosts[0].releaseTimer = 0;
 
   ghosts[1].x = 14;
   ghosts[1].y = 14;
@@ -242,20 +243,23 @@ function resetEntities() {
   ghosts[1].dirY = 0;
   ghosts[1].mode = "normal";
   ghosts[1].scaredTimer = 0;
+  ghosts[1].releaseTimer = 0;
 
   ghosts[2].x = 13;
-  ghosts[2].y = 15;
+  ghosts[2].y = 14;
   ghosts[2].dirX = 0;
   ghosts[2].dirY = -1;
   ghosts[2].mode = "normal";
   ghosts[2].scaredTimer = 0;
+  ghosts[2].releaseTimer = 3;
 
   ghosts[3].x = 14;
-  ghosts[3].y = 15;
+  ghosts[3].y = 14;
   ghosts[3].dirX = 0;
   ghosts[3].dirY = 1;
   ghosts[3].mode = "normal";
   ghosts[3].scaredTimer = 0;
+  ghosts[3].releaseTimer = 6;
 }
 
 function restartGame() {
@@ -412,6 +416,12 @@ function nextLevel() {
 }
 
 function moveGhost(ghost, deltaSeconds) {
+  // Handle release timer for new ghosts
+  if (ghost.releaseTimer > 0) {
+    ghost.releaseTimer -= deltaSeconds;
+    return; // Don't move ghost until released
+  }
+  
   let speed = 6 * deltaSeconds;
   
   // Ghosts move slower when scared
@@ -464,6 +474,9 @@ function distance(a, b) {
 
 function checkCollisions() {
   for (const ghost of ghosts) {
+    // Don't check collisions for ghosts that haven't been released yet
+    if (ghost.releaseTimer > 0) continue;
+    
     if (distance(ghost, pacman) < 0.7) {
       if (ghost.mode === "scared") {
         // Eat the ghost
@@ -473,7 +486,7 @@ function checkCollisions() {
         
         // Reset ghost to home position
         ghost.x = 13 + Math.floor(Math.random() * 2);
-        ghost.y = 14 + Math.floor(Math.random() * 2);
+        ghost.y = 14;
         ghost.mode = "normal";
         ghost.scaredTimer = 0;
       } else {
@@ -575,6 +588,9 @@ function drawPacman() {
 }
 
 function drawGhost(ghost) {
+  // Don't draw ghosts that haven't been released yet
+  if (ghost.releaseTimer > 0) return;
+  
   // Draw centered on the ghost's tile so they don't appear half on wall
   const gx = (Math.round(ghost.x) * corridorTile) + corridorTile / 2;
   const gy = (Math.round(ghost.y) * corridorTile) + corridorTile / 2;
