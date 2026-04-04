@@ -15,16 +15,34 @@
             Score:
             <span id="score">0</span>
           </div>
+          <div class="high-score-label">
+            High Score:
+            <span id="highScore">0</span>
+          </div>
+          <div class="level-label">
+            Level:
+            <span id="level">1</span>
+          </div>
           <div class="lives-label">
             Lives:
             <span id="lives">3</span>
           </div>
+          <button id="soundToggle" class="sound-btn">🔊</button>
+          <button id="pauseBtn" class="pause-btn">⏸️</button>
           <button id="restartBtn" class="restart-btn">Restart 🔁</button>
         </div>
       </header>
 
       <main class="game-container">
         <canvas id="gameCanvas" width="560" height="620"></canvas>
+        <div class="mobile-controls">
+          <button class="control-btn" data-direction="up">↑</button>
+        </div>
+        <div class="mobile-controls">
+          <button class="control-btn" data-direction="left">←</button>
+          <button class="control-btn" data-direction="down">↓</button>
+          <button class="control-btn" data-direction="right">→</button>
+        </div>
         <p class="hint">
           Use arrow keys or WASD to move. Collect all pellets, avoid ghosts!
         </p>
